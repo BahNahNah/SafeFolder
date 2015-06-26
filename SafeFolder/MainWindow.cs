@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Security.Cryptography;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
+using System.IO;
 
 namespace SafeFolder
 {
@@ -53,6 +54,25 @@ namespace SafeFolder
             }
         }
 
+        private string EncryptString(string obf8_, string encBase, string salt)
+        {
+            byte[] obf14_ = System.Text.Encoding.UTF8.GetBytes(obf8_);
+            using (Rijndael obf9_ = new RijndaelManaged())
+            {
+                PasswordDeriveBytes obf16_ = new PasswordDeriveBytes(encBase, System.Text.Encoding.UTF8.GetBytes(salt));
+                obf9_.Key = obf16_.GetBytes(obf9_.KeySize / 8);
+                obf9_.IV = obf16_.GetBytes(obf9_.BlockSize / 8);
+                using (MemoryStream obf15_ = new MemoryStream())
+                {
+                    using (CryptoStream obf17_ = new CryptoStream(obf15_, obf9_.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        obf17_.Write(obf14_, 0, obf14_.Length);
+                    }
+                    return Convert.ToBase64String(obf15_.ToArray());
+                }
+            }
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             CSharpCodeProvider compiler = new CSharpCodeProvider();
@@ -72,8 +92,51 @@ namespace SafeFolder
                 i++;
             }
 
+            string[] FuncEnc = new string[] { "obf_str_enc_func_" };
+            foreach (string funcS in FuncEnc)
+            {
+                string gname = GenStr(10, varGen);
+                while (!varnameVerify.Add(gname))
+                    gname = GenStr(10, varGen);
+                s = s.Replace(funcS, gname);
+            }
+
+            string DescFuncName = GenStr(10, varGen);
+            while (!varnameVerify.Add(DescFuncName))
+                DescFuncName = GenStr(10, varGen);
+            s = s.Replace("obf_str_dec_func_", DescFuncName);
+
+            Dictionary<string, string> StrEnc = new Dictionary<string, string>()
+            {
+                {"[PWPROMPT]", "Password: "},
+                {"[WRONGPROMPT]", "Wrong."},
+                {"[DIRDATA]", "dirdata"},
+                {"[ENTERTODECRYPT]", "Press enter to decrypt..."},
+                {"[ENTERTOENCRYPT]", "Press enter to encrypt..."},
+                {"[DONE]", "Done."},
+                {"[BLACKSLASHB]", "\\b"},
+                {"[PWMASK]", "*"},
+                {"[ENCRYPTEDOUTPUT]","Encrypted: {0}"},
+                {"[DECRYPTEDOUTPUT]","Decrypted: {0}"},
+                {"[ERRORPARAMS]", "({0}) {1}"},
+                {"[TIMES2]", "x2"},
+                {"[FAILEDDELETEDIRDATA]", "Failed to delete dirdata, please manualy delete."},
+                {"[LOADEDFILENAME]", "Loaded file name: {0}"},
+                {"[CREDIT]", "SafeFolder by BahNahNah"}
+            };
+
+            foreach(var strDic in StrEnc)
+            {
+                string salt = GenStr(5, cMap);
+                string enc = EncryptString(strDic.Value, salt, SeedLabel.Text);
+                string replace = string.Format("{0}(\"{1}\", \"{2}\")", DescFuncName, enc, salt);
+                string from = string.Format("\"{0}\"", strDic.Key);
+                s = s.Replace(from, replace);
+            }
+
             s = s.Replace("[SALT]", SeedLabel.Text);
             s = s.Replace("[PWHASH]", ShaHash(textBox1.Text));
+
 
             using(SaveFileDialog sfd = new SaveFileDialog())
             {
