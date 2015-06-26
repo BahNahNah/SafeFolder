@@ -75,6 +75,11 @@ namespace SafeFolder
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if(textBox1.Text == string.Empty)
+            {
+                MessageBox.Show("Enter a password.");
+                return;
+            }
             CSharpCodeProvider compiler = new CSharpCodeProvider();
             CompilerParameters parmiters = new CompilerParameters(new string[] { "mscorlib.dll", "System.Core.dll", "System.dll" });
             parmiters.GenerateExecutable = true;
@@ -122,7 +127,8 @@ namespace SafeFolder
                 {"[TIMES2]", "x2"},
                 {"[FAILEDDELETEDIRDATA]", "Failed to delete dirdata, please manualy delete."},
                 {"[LOADEDFILENAME]", "Loaded file name: {0}"},
-                {"[CREDIT]", "SafeFolder by BahNahNah"}
+                {"[CREDIT]", "SafeFolder by BahNahNah"},
+                {"[PWHASH]", ShaHash(textBox1.Text)}
             };
 
             foreach(var strDic in StrEnc)
@@ -135,7 +141,7 @@ namespace SafeFolder
             }
 
             s = s.Replace("[SALT]", SeedLabel.Text);
-            s = s.Replace("[PWHASH]", ShaHash(textBox1.Text));
+            //s = s.Replace("[PWHASH]", ShaHash(textBox1.Text));
 
 
             using(SaveFileDialog sfd = new SaveFileDialog())
