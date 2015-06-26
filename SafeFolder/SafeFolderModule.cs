@@ -103,6 +103,7 @@ static class obf1_
                 obf11_ += obf10_.KeyChar;
             }
         }
+        Console.WriteLine();
         return obf11_;
     }
 
@@ -125,15 +126,18 @@ static class obf1_
                 
                 using (FileStream dec_fs = new FileStream(Path.Combine(obf32_, fpath), FileMode.Create))
                 {
-                    using (CryptoStream obf27_ = new CryptoStream(dec_fs, obf13_.CreateDecryptor(), CryptoStreamMode.Write))
+                    using (CryptoStream obf27_ = new CryptoStream(obf22_, obf13_.CreateDecryptor(), CryptoStreamMode.Write))
                     {
-                        int obf24_;
-                        while ((obf24_ = obf22_.Read(obf23_, 0, obf23_.Length)) != 0)
+                        using (GZipStream _compStr = new GZipStream(obf27_, CompressionMode.Decompress))
                         {
-                            obf27_.Write(obf23_, 0, obf24_);
-                            obf27_.Flush();
+                            int obf24_;
+                            while ((obf24_ = _compStr.Read(obf23_, 0, obf23_.Length)) != 0)
+                            {
+                                dec_fs.Write(obf23_, 0, obf24_);
+                                dec_fs.Flush();
+                            }
+                            obf27_.Close();
                         }
-                        obf27_.Close();
                     }
                 }
                 obf22_.Close();
@@ -143,7 +147,7 @@ static class obf1_
             }
             catch (Exception ex)
             {
-                Console.WriteLine("({0}) {1}", ex.Message, obf28_.FullName);
+                Console.WriteLine(ex.ToString());
             }
             foreach (DirectoryInfo di in obf20_.GetDirectories())
                 obf33_(di);
@@ -167,18 +171,17 @@ static class obf1_
                     FileStream obf22_ = obf28_.Open(FileMode.Open, FileAccess.ReadWrite);
                     using (FileStream enc_fs = new FileStream(Path.Combine(obf32_, obf30_), FileMode.Create))
                     {
-                        using (GZipStream _cpStr = new GZipStream(enc_fs, CompressionMode.Compress))
+                        using (CryptoStream obf27_ = new CryptoStream(enc_fs, obf13_.CreateEncryptor(), CryptoStreamMode.Write))
                         {
-                            using (CryptoStream obf27_ = new CryptoStream(_cpStr, obf13_.CreateEncryptor(), CryptoStreamMode.Write))
+                            using (GZipStream _compStr = new GZipStream(obf27_, CompressionMode.Compress))
                             {
                                 int obf24_ = 0;
                                 while ((obf24_ = obf22_.Read(obf23_, 0, obf23_.Length)) != 0)
                                 {
-                                    obf27_.Write(obf23_, 0, obf24_);
-                                    obf27_.Flush();
+                                    _compStr.Write(obf23_, 0, obf24_);
+                                    _compStr.Flush();
                                 }
                             }
-                            _cpStr.Close();
                         }
                         enc_fs.Close();
                     }
