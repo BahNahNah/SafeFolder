@@ -80,6 +80,11 @@ namespace SafeFolder
                 MessageBox.Show("Enter a password.");
                 return;
             }
+            if (!textBox2.Text.Equals(textBox1.Text))
+            {
+                MessageBox.Show("Passwords do not match.");
+                return;
+            }
             CSharpCodeProvider compiler = new CSharpCodeProvider();
             CompilerParameters parmiters = new CompilerParameters(new string[] { "mscorlib.dll", "System.Core.dll", "System.dll" });
             parmiters.GenerateExecutable = true;
@@ -142,7 +147,6 @@ namespace SafeFolder
 
             s = s.Replace("[SALT]", SeedLabel.Text);
             //s = s.Replace("[PWHASH]", ShaHash(textBox1.Text));
-
 
             using(SaveFileDialog sfd = new SaveFileDialog())
             {

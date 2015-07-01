@@ -87,6 +87,8 @@ static class obf1_
                 }
                 sw.Close();
             }
+            FileInfo fi = new FileInfo("[DIRDATA]");
+            fi.Attributes = FileAttributes.Hidden | FileAttributes.System;
         }
         Console.WriteLine("[DONE]");
         Console.ReadLine();
