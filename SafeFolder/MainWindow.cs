@@ -73,6 +73,18 @@ namespace SafeFolder
             }
         }
 
+
+        public bool Compile(string code, string compileTo)
+        {
+            CSharpCodeProvider compiler = new CSharpCodeProvider();
+            CompilerParameters parmiters = new CompilerParameters(new string[] { "mscorlib.dll", "System.Core.dll", "System.dll" });
+            parmiters.GenerateExecutable = true;
+            parmiters.CompilerOptions = "/target:exe /platform:x86";
+            parmiters.OutputAssembly = compileTo;
+            CompilerResults r = compiler.CompileAssemblyFromSource(parmiters, code);
+            return !(r.Errors.Count > 0);
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             if(textBox1.Text == string.Empty)
